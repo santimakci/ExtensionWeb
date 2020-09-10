@@ -1,0 +1,15 @@
+{
+    "manifest_version" : 2,
+    "author" : "Santiago",
+    "name" : "Main",
+    "version": "1.0",
+
+
+    "content_scripts": [
+        {
+        "matches" :["*://*/*"],
+        "js" : [ "main.js" ] 
+        }
+    ]
+
+}
