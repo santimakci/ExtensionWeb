@@ -1,29 +1,35 @@
 class BackgroundExtension {
 
+	captarBusqueda(){
+		browser.tabs.sendMessage({
+			call: "captarBusqueda"
+	} )}
 
-    imprimirUrl(){
-		this.getCurrentTab().then((tabs) => {
-			browser.tabs.sendMessage(tabs[0].id, {
-				call: "imprimirUrl"
-			});
-		});
+	googleResults(args){
+		return new Promise( (resolve) => {
+			var busquedas = []
+			document.querySelectorAll("div cite").forEach(H3 => {
+				if (H3.innerText != ""){
+					busquedas.push(H3.innerText)
+				}
+			})
+				resolve("holaaa")
+		}) }
+
+	promesa(){
+		return new Promise((resolve) => {
+			resolve("Promesa de prueba")
+		}
+		)
 	}
 
-    getCurrentTab(callback) {
-		return browser.tabs.query({
-			active: true,
-			currentWindow: true
-		});
-	}
    
 }
 
-var startBackground = function(config) {
-	var extension = new BackgroundExtension(config.apiUrl);
+var startBackground = function() {
+	var extension = new BackgroundExtension();
 
-	browser (() => {
-	  extension.imprimirUrl();
-	});
+	extension.captarBusqueda()
 
 	browser.runtime.onMessage.addListener((request, sender) => {
 		console.log("[background-side] calling the message: " + request.call);
@@ -33,30 +39,3 @@ var startBackground = function(config) {
 	});
 }
 
-
-function checkExpectedParameters(config){
-	if (config == undefined)
-		return false;
-
-    var foundParams = ["apiUrl"].filter(param => (param && config.hasOwnProperty(param)));
-    return (config.length == foundParams.length);
-}
-
-browser.storage.local.get("config").then(data => {
-    if (!checkExpectedParameters(data.config)) {
-        data.config = {
-        	"apiUrl": ""
-        };
-        //Si no se setea, se puede perder consistencia con lo que se lee en la pagina de config
-        browser.storage.local.set({"config": data.config }).then(() => startBackground(data.config));
-    }
-    else startBackground(data.config);
-});
-
-//Listening for background's messages
-browser.runtime.onMessage.addListener((request, sender) => {
-	console.log("[content-side] calling the message: " + request.call);
-	if(pageManager[request.call]){
-		pageManager[request.call](request.args);
-	}
-});
