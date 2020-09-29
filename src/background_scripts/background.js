@@ -7,35 +7,27 @@ class BackgroundExtension {
 
 	googleResults(args){
 		return new Promise( (resolve) => {
+			var parser = new DOMParser();
+			var doc = parser.parseFromString(args.url, "text/html");
+			console.log(doc)
 			var busquedas = []
-			document.querySelectorAll("div cite").forEach(H3 => {
+			doc.querySelectorAll("div cite").forEach(H3 => {
 				if (H3.innerText != ""){
 					busquedas.push(H3.innerText)
 				}
 			})
-				resolve("holaaa")
+				resolve(busquedas)
 		}) }
 
-	promesa(){
-		return new Promise((resolve) => {
-			resolve("Promesa de prueba")
-		}
-		)
-	}
 
    
 }
 
-var startBackground = function() {
-	var extension = new BackgroundExtension();
+var extension = new BackgroundExtension() 
 
-	extension.captarBusqueda()
-
-	browser.runtime.onMessage.addListener((request, sender) => {
-		console.log("[background-side] calling the message: " + request.call);
-		if(extension[request.call]){
-			return extension[request.call](request.args);
-		}
-	});
-}
+browser.runtime.onMessage.addListener((request, sender) => {
+	console.log("[background-side] calling the message: " + request.call);
+	if(extension[request.call]){
+		return extension[request.call](request.args);
+	} } )
 
