@@ -5,21 +5,26 @@ class BackgroundExtension {
 			call: "captarBusqueda"
 	} )}
 
-	googleResults(args){
-		return new Promise( (resolve) => {
-			var parser = new DOMParser();
-			var doc = parser.parseFromString(args.url, "text/html");
-			console.log(doc)
-			var busquedas = []
-			doc.querySelectorAll("div cite").forEach(H3 => {
-				if (H3.innerText != ""){
-					busquedas.push(H3.innerText)
-				}
-			})
-				resolve(busquedas)
-		}) }
+	google(args){
+		return new Promise( (resolve) =>{
+			console.log('entro en google')
+			resolve('resultado')	
+		});
+	}
 
+	duckduckgo(args){
+		return new Promise( (resolve) =>{
+			console.log('entro en duckduckgo')
+			resolve('resultado')	
+		});
+	}
 
+	bing(args){
+		return new Promise( (resolve) =>{
+			console.log('entro en bing')
+			resolve('resultado')	
+		});
+	}
    
 }
 
