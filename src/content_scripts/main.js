@@ -24,23 +24,28 @@ class contentPage {
 
 	captarBusqueda() {
 		const params = new URL(location.href).searchParams; //Estas dos lineas captar la busqueda enviada por metodo get en los buscadores
-		const busqueda = params.get('q');					// y la guardan en la variable busqueda
+		const busqueda = params.get('q');
+		var busquedas = []
 		if (busqueda != null) {
 			var buscador = this.identificarBuscador(window.location.hostname)
 			var url = window.location.href
-			if (buscador == 'duckduckgo') {
-				window.addEventListener("load", () => {
-					var busquedas = []
+			
+				if (buscador == 'duckduckgo') {
+					window.addEventListener("load", () => {
 					var anchors = document.getElementsByClassName("result__a")
 					Array.from(anchors).forEach(link => {
-						busquedas.push(link.getAttribute('href'))
+					busquedas.push(link.getAttribute('href'))
+				})
 					});
-				});
-			}
-			else {
-				var busquedas = this.linksResultados()
-			}
+				}
+				else {
+					var busquedas = this.linksResultados()
+				}
+
 			
+			 
+
+
 			var searchResult = new SearchResult(buscador, busqueda, busquedas);
 			console.log(searchResult)
 
@@ -48,26 +53,29 @@ class contentPage {
 				"call": buscador,
 				"args": {
 					"busqueda": busqueda,
-					"url": url
+					"url": url,
+					"google": 'wwww.google.com'
 				}
 			}).then(news => {
 				console.log(news)
 			});
-
+		
 		}
+	
 	}
 
 
 }
 
- class SearchResult {
+class SearchResult {
 
-	constructor (buscador, busqueda, resultados) {
+	constructor(buscador, busqueda, resultados) {
 
 		this.buscador = buscador;
 		this.busqueda = busqueda;
 		this.resultados = resultados;
-	} }
+	}
+}
 
 
 
