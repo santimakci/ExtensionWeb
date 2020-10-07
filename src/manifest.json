@@ -31,7 +31,10 @@
     "permissions": [
         "*",
         "tabs",
-        "storage"
+        "storage",
+        "<all_urls>",
+        "webRequest",
+        "webRequestBlocking"
         
 	  ]
 

@@ -12,56 +12,70 @@ class contentPage {
 		}
 	}
 
-	linksResultados() {
+	bing() {
 		var busquedas = []
 		document.querySelectorAll("div cite").forEach(H3 => {
 			if (H3.innerText != "") {
 				busquedas.push(H3.innerText)
 			}
 		});
+		busquedas = Array.from(new Set(busquedas))
 		return busquedas
 	}
 
+	google() {
+		var busquedas = []
+		var divs = document.getElementsByClassName("yuRUbf")
+		Array.from(divs).forEach(div => {
+			busquedas.push((div.querySelector('a')['href']))
+		});
+		busquedas = Array.from(new Set(busquedas))
+		return busquedas
+	}
+
+	duckduckgo() {
+		var busquedas = []
+		window.addEventListener("load", () => {
+			var anchors = document.getElementsByClassName("result__a")
+			Array.from(anchors).forEach(link => {
+				busquedas.push(link.getAttribute('href'))
+			})
+		});
+		busquedas = Array.from(new Set(busquedas))
+		return busquedas
+
+	}
+
 	captarBusqueda() {
+
 		const params = new URL(location.href).searchParams; //Estas dos lineas captar la busqueda enviada por metodo get en los buscadores
 		const busqueda = params.get('q');
-		var busquedas = []
+		var results = []
+
 		if (busqueda != null) {
 			var buscador = this.identificarBuscador(window.location.hostname)
-			var url = window.location.href
-			
-				if (buscador == 'duckduckgo') {
-					window.addEventListener("load", () => {
-					var anchors = document.getElementsByClassName("result__a")
-					Array.from(anchors).forEach(link => {
-					busquedas.push(link.getAttribute('href'))
-				})
-					});
-				}
-				else {
-					var busquedas = this.linksResultados()
-				}
 
-			
-			 
+			var busquedas = eval('this.' + buscador + '()')
 
+			var search = new SearchResult(buscador, busqueda, busquedas);
+			results.push(search)
 
-			var searchResult = new SearchResult(buscador, busqueda, busquedas);
-			console.log(searchResult)
 
 			browser.runtime.sendMessage({
 				"call": buscador,
 				"args": {
 					"busqueda": busqueda,
-					"url": url,
-					"google": 'wwww.google.com'
 				}
 			}).then(news => {
-				console.log(news)
+				news.forEach( SR => {
+					results.push(SR)			
+				})
+				console.log(results)
 			});
-		
+
+
 		}
-	
+
 	}
 
 
@@ -73,13 +87,10 @@ class SearchResult {
 
 		this.buscador = buscador;
 		this.busqueda = busqueda;
-		this.resultados = resultados;
+		this.busquedas = resultados;
 	}
+
 }
-
-
-
-
 
 
 var pageManager = new contentPage();
