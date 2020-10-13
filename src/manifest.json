@@ -23,7 +23,9 @@
                     "*://*.bing.com/*",
                     "*://*.duckduckgo.com/*"
                     ],
-        "js" : [ "content_scripts/main.js"                
+        "js" : [ "content_scripts/main.js",
+                 "Classes/searchResult.js" 
+                                
          ] 
         }
     ], 
@@ -36,6 +38,9 @@
         "webRequest",
         "webRequestBlocking"
         
-	  ]
+      ], 
+      "web_accessible_resources": [
+        "*"
+      ]
 
 }

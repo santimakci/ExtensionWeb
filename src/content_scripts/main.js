@@ -34,52 +34,57 @@ class contentPage {
 	}
 
 	duckduckgo() {
+
 		var busquedas = []
 		window.addEventListener("load", () => {
 			var anchors = document.getElementsByClassName("result__a")
 			Array.from(anchors).forEach(link => {
 				busquedas.push(link.getAttribute('href'))
 			})
-		});
-		busquedas = Array.from(new Set(busquedas))
-		return busquedas
+			busquedas = Array.from(new Set(busquedas))
 
+			return busquedas
+
+		});
+
+
+
+	}
+	prueba() {
+		return new Promise(resolve => {
+			resolve('prueba')
+		})
 	}
 
 	captarBusqueda() {
+		return new Promise((resolve) => {
+			const params = new URL(location.href).searchParams; //Estas dos lineas captar la busqueda enviada por metodo get en los buscadores
+			const busqueda = params.get('q');
+			var results = []
+			if (busqueda != null) {
+				var buscador = this.identificarBuscador(window.location.hostname)
+				var busquedas = eval('this.' + buscador + '()')
+				var search = new SearchResult(buscador, busqueda, busquedas);
+				results.push(search)
+				console.log(search)
 
-		const params = new URL(location.href).searchParams; //Estas dos lineas captar la busqueda enviada por metodo get en los buscadores
-		const busqueda = params.get('q');
-		var results = []
+				browser.runtime.sendMessage({
+					"call": buscador,
+					"args": {
+						"busqueda": busqueda,
+						"search": search
+					}
+				}).then(news => {
+					resolve()
+				});
 
-		if (busqueda != null) {
-			var buscador = this.identificarBuscador(window.location.hostname)
+			}
 
-			var busquedas = eval('this.' + buscador + '()')
-
-			var search = new SearchResult(buscador, busqueda, busquedas);
-			results.push(search)
-
-
-			browser.runtime.sendMessage({
-				"call": buscador,
-				"args": {
-					"busqueda": busqueda,
-				}
-			}).then(news => {
-				news.forEach( SR => {
-					results.push(SR)			
-				})
-				console.log(results)
-			});
-
-
-		}
-
+		});
 	}
 
-
 }
+
 
 class SearchResult {
 
@@ -90,17 +95,20 @@ class SearchResult {
 		this.busquedas = resultados;
 	}
 
+	getBuscador() {
+		return this.buscador
+	}
+
 }
 
 
 var pageManager = new contentPage();
 
-pageManager.captarBusqueda()
 
 
 browser.runtime.onMessage.addListener((request, sender) => {
 	console.log("[content-side] calling the message: " + request.call);
 	if (pageManager[request.call]) {
-		pageManager[request.call](request.args);
+		pageManager[request.call](request.args)
 	}
 });
