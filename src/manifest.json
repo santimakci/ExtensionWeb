@@ -23,8 +23,7 @@
                     "*://*.bing.com/*",
                     "*://*.duckduckgo.com/*"
                     ],
-        "js" : [ "content_scripts/main.js",
-                 "Classes/searchResult.js" 
+        "js" : [ "content_scripts/main.js"
                                 
          ] 
         }

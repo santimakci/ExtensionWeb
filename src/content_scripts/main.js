@@ -34,27 +34,16 @@ class contentPage {
 	}
 
 	duckduckgo() {
-
 		var busquedas = []
-		window.addEventListener("load", () => {
-			var anchors = document.getElementsByClassName("result__a")
-			Array.from(anchors).forEach(link => {
-				busquedas.push(link.getAttribute('href'))
-			})
-			busquedas = Array.from(new Set(busquedas))
-
-			return busquedas
-
-		});
-
-
-
-	}
-	prueba() {
-		return new Promise(resolve => {
-			resolve('prueba')
+		var anchors = document.getElementsByClassName("result__a")
+		Array.from(anchors).forEach(link => {
+			busquedas.push(link.getAttribute('href'))
 		})
+		busquedas = Array.from(new Set(busquedas))
+		return busquedas
+
 	}
+
 
 	captarBusqueda() {
 		return new Promise((resolve) => {
@@ -75,7 +64,7 @@ class contentPage {
 						"search": search
 					}
 				}).then(news => {
-					resolve()
+					resolve(news)
 				});
 
 			}
@@ -95,15 +84,11 @@ class SearchResult {
 		this.busquedas = resultados;
 	}
 
-	getBuscador() {
-		return this.buscador
-	}
 
 }
 
 
 var pageManager = new contentPage();
-
 
 
 browser.runtime.onMessage.addListener((request, sender) => {

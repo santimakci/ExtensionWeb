@@ -16,7 +16,7 @@ class BackgroundExtension {
 
 	prueba() {
 		return new Promise(resolve => {
-
+			resultados = []
 			this.getCurrentTab().then((tabs) => {
 				browser.tabs.sendMessage(tabs[0].id, {
 					call: "captarBusqueda"
@@ -51,15 +51,18 @@ class BackgroundExtension {
 	}
 
 	duckduckgoResults(busqueda) {
-		var url = 'https://duckduckgo.com/' + '?q=' + busqueda + '&t=h_&ia=web'
-		this.consulta(url).then(doc => {
+			var url = 'https://www.duckduckgo.com/' + '?q=' + busqueda + '&t=h_&ia=web'
+			var doc = this.consulta(url)
+			console.log(doc)
 			var busquedas = []
-			var anchors = doc.getElementsByClassName('result__a')
-			console.log(Array.from(anchors))
-			busquedas = Array.from(new Set(busquedas))
+			var anchors = doc.getElementById('r1-1 ')
+			console.log(anchors.length)
+			Array.from(anchors).forEach(link => {
+				busquedas.push(link.getAttribute('href'))
+			})
+			 busquedas = Array.from(new Set(busquedas))
 			var search = new SearchResult('duckduckgo', busqueda, busquedas);
 			return search
-		})
 
 	}
 
@@ -67,6 +70,7 @@ class BackgroundExtension {
 	googleResults(busqueda) {
 		var url = 'http://www.google.com/' + 'search?q=' + busqueda + '&oq=' + busqueda
 		var doc = this.consulta(url)
+		console.log(doc)
 		var busquedas = []
 		var divs = doc.getElementsByClassName("yuRUbf")
 		Array.from(divs).forEach(div => {
@@ -95,10 +99,10 @@ class BackgroundExtension {
 
 	google(args) {
 		return new Promise((resolve, reject) => {
-			var results = []
-			results.push(this.duckduckgoResults(args.busqueda))
+			var results = []			
 			results.push(this.bingResults(args.busqueda))
 			results.push(args.search)
+		 	results.push(this.duckduckgoResults(args.busqueda)) 
 			resultados = results
 			resolve(resultados)
 		});
@@ -106,7 +110,6 @@ class BackgroundExtension {
 
 	duckduckgo(args) {
 		return new Promise((resolve) => {
-
 			var results = []
 			results.push(this.googleResults(args.busqueda))
 			results.push(this.bingResults(args.busqueda))
@@ -119,12 +122,11 @@ class BackgroundExtension {
 	bing(args) {
 		return new Promise((resolve) => {
 			var results = []
-			results.push(this.duckduckgoResults(args.busqueda))
+			results.push(this.duckduckgoResults(args.busqueda)) 
 			results.push(this.googleResults(args.busqueda))
 			results.push(args.search)
 			resultados = results
 			resolve(resultados)
-
 		});
 	}
 
@@ -136,7 +138,7 @@ class SearchResult {
 
 		this.buscador = buscador;
 		this.busqueda = busqueda;
-		this.resultados = resultados;
+		this.busquedas = resultados;
 	}
 
 }

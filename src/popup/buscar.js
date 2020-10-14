@@ -1,29 +1,23 @@
 
-function agregarTitulo(results) {
+function agregarTitulo(results, i) {
     var capa = document.getElementById("cuerpo");
     var h1 = document.createElement("p");
-    h1.innerHTML = results.buscador + ':'+ results.busqueda;
+    h1.innerHTML = results.buscador + ':' + (results.busquedas[i]).link((results.busquedas[i]));
     capa.appendChild(h1);
 }
 
 
+function requestResults() {
 
-function getCurrentTab(callback) {
-    return browser.tabs.query({
-        active: true,
-        currentWindow: true
-    });
-}
-
-function requestResults(){
-
-browser.runtime.sendMessage({
-    "call": 'prueba'
-}).then(results => {
+    browser.runtime.sendMessage({
+        "call": 'prueba'
+    }).then(results => {
         console.log(results)
-        this.agregarTitulo(results[0])
-        this.agregarTitulo(results[1])
-        this.agregarTitulo(results[2])
+        for (var i = 0; i < 5; i++) {
+            this.agregarTitulo(results[0], i)
+            this.agregarTitulo(results[1], i)
+            this.agregarTitulo(results[2], i)
+        }
     })
 
 }
