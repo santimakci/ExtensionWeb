@@ -12,14 +12,27 @@ class contentPage {
 		}
 	}
 
+	mostrarPos(){
+		var divs = document.getElementsByClassName("yuRUbf")
+		Array.from(divs).forEach(div => {
+			div.innerHTML += 'resultado' 
+			
+		});
+
+	}
+
 	bing() {
 		var busquedas = []
-		document.querySelectorAll("div cite").forEach(H3 => {
-			if (H3.innerText != "") {
-				busquedas.push(H3.innerText)
-			}
-		});
+		var anchors = document.getElementsByClassName("b_title")
+		
+		Array.from(anchors).forEach(link => {
+/* 			href = link.getElementsByTagName('a')
+ */			Array.from(link.getElementsByTagName('a')).forEach( href =>{
+				busquedas.push(href.getAttribute('href')) })
+
+		})
 		busquedas = Array.from(new Set(busquedas))
+		console.log(busquedas)
 		return busquedas
 	}
 

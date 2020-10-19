@@ -3,16 +3,13 @@ var resultados = []
 class BackgroundExtension {
 	
 
-	/* 	captarBusqueda() {
-			this.getCurrentTab().then((tabs) => {
-				browser.tabs.sendMessage(tabs[0].id, {
-					call: "captarBusqueda"
-				}).then(results => {
-					console.log(results)
-				});
-			}
-		}
-	 */
+	imprimirPosiciones(){
+		this.getCurrentTab().then((tabs) => {
+			browser.tabs.sendMessage(tabs[0].id, {
+				call: "mostrarPos",
+				args: resultados
+			})
+	})}
 
 	prueba() {
 		return new Promise(resolve => {
@@ -46,37 +43,32 @@ class BackgroundExtension {
 			var doc = parser.parseFromString(request.response, "text/html");
 			return doc
 		}
-
-
 	}
 
 	duckduckgoResults(busqueda) {
-			var url = 'https://www.duckduckgo.com/' + '?q=' + busqueda + '&t=h_&ia=web'
+			var url = 'https://duckduckgo.com/html/' + '?q=' + busqueda 
 			var doc = this.consulta(url)
 			console.log(doc)
 			var busquedas = []
-			var anchors = doc.getElementById('r1-1 ')
-			console.log(anchors.length)
+			var anchors = doc.getElementsByClassName('result__a')
 			Array.from(anchors).forEach(link => {
 				busquedas.push(link.getAttribute('href'))
 			})
 			 busquedas = Array.from(new Set(busquedas))
 			var search = new SearchResult('duckduckgo', busqueda, busquedas);
 			return search
-
 	}
 
 
 	googleResults(busqueda) {
 		var url = 'http://www.google.com/' + 'search?q=' + busqueda + '&oq=' + busqueda
 		var doc = this.consulta(url)
-		console.log(doc)
 		var busquedas = []
 		var divs = doc.getElementsByClassName("yuRUbf")
 		Array.from(divs).forEach(div => {
 			busquedas.push((div.querySelector('a')['href']))
 		});
-
+		busquedas = Array.from(new Set(busquedas))
 		var search = new SearchResult('google', busqueda, busquedas);
 		return search
 	}
@@ -102,7 +94,7 @@ class BackgroundExtension {
 			var results = []			
 			results.push(this.bingResults(args.busqueda))
 			results.push(args.search)
-		 	results.push(this.duckduckgoResults(args.busqueda)) 
+			results.push(this.duckduckgoResults(args.busqueda)) 
 			resultados = results
 			resolve(resultados)
 		});
