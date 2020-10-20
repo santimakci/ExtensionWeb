@@ -1,24 +1,33 @@
-var resultados = []
+
 
 class BackgroundExtension {
+
+	constructor(){
+		this.resultados = []
+		this.buscador = ''
+	}
 	
 
 	imprimirPosiciones(){
 		this.getCurrentTab().then((tabs) => {
 			browser.tabs.sendMessage(tabs[0].id, {
 				call: "mostrarPos",
-				args: resultados
+				args: {
+					"resultados": this.resultados
+				}
 			})
-	})}
+	}) 
+}
 
 	prueba() {
 		return new Promise(resolve => {
-			resultados = []
+			this.resultados = []
 			this.getCurrentTab().then((tabs) => {
 				browser.tabs.sendMessage(tabs[0].id, {
 					call: "captarBusqueda"
 				}).then( () => {
-					resolve(resultados)
+					this.imprimirPosiciones()
+					resolve(this.resultados)
 				})
 			})
 			
@@ -54,8 +63,14 @@ class BackgroundExtension {
 			Array.from(anchors).forEach(link => {
 				busquedas.push(link.getAttribute('href'))
 			})
-			 busquedas = Array.from(new Set(busquedas))
-			var search = new SearchResult('duckduckgo', busqueda, busquedas);
+			busquedas = Array.from(new Set(busquedas))
+			var final =[]
+			busquedas.forEach( string =>{
+				if (!string.includes('duckduckgo') ){
+					final.push(string)
+				}
+			})
+			var search = new SearchResult('duckduckgo', busqueda, final);
 			return search
 	}
 
@@ -95,8 +110,9 @@ class BackgroundExtension {
 			results.push(this.bingResults(args.busqueda))
 			results.push(args.search)
 			results.push(this.duckduckgoResults(args.busqueda)) 
-			resultados = results
-			resolve(resultados)
+			this.resultados = results
+			this.buscador = 'google'
+			resolve(this.resultados)
 		});
 	}
 
@@ -106,8 +122,9 @@ class BackgroundExtension {
 			results.push(this.googleResults(args.busqueda))
 			results.push(this.bingResults(args.busqueda))
 			results.push(args.search)
-			resultados = results
-			resolve(resultados)
+			this.resultados = results
+			this.buscador = 'duckduckgo'
+			resolve(this.resultados)
 		});
 	}
 
@@ -117,8 +134,9 @@ class BackgroundExtension {
 			results.push(this.duckduckgoResults(args.busqueda)) 
 			results.push(this.googleResults(args.busqueda))
 			results.push(args.search)
-			resultados = results
-			resolve(resultados)
+			this.resultados = results
+			this.buscador = 'bing'
+			resolve(this.resultados)
 		});
 	}
 

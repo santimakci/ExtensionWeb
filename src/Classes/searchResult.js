@@ -1,4 +1,5 @@
-class SearchResult {
+
+export default class SearchResult {
 
 	constructor(buscador, busqueda, resultados) {
 
@@ -12,3 +13,4 @@ class SearchResult {
     }
 
 }
+

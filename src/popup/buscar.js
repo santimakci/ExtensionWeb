@@ -47,4 +47,5 @@ function printPos(){
 
 
 this.requestResults()
-/* this.printPos() */
+/* this.printPos() 
+ */
