@@ -27,15 +27,11 @@ class contentPage {
 
 			const params = new URL(location.href).searchParams; //Estas dos lineas captar la busqueda enviada por metodo get en los buscadores
 			const busqueda = params.get('q');
-			var results = []
 			if (busqueda != null) {
 				var buscador = this.identificarBuscador(window.location.hostname)
-				console.log('llego')
 				this.page = eval('new ' + buscador + '()')
 				var busquedas = (this.page).buscar()
 				var search = new SearchResult(buscador, busqueda, busquedas);
-				results.push(search)
-
 				browser.runtime.sendMessage({
 					"call": buscador,
 					"args": {
@@ -195,8 +191,6 @@ class duckduckgo extends Buscador {
 			resultados.forEach(res => {  //recorremos los resultados
 				if (res.buscador != 'duckduckgo') { // entramos en aquellos que no sea igual a la pagina que estamos escribiendo
 					for (var i = 0; i < (res.busquedas).length; i++) { //Recorremos todas las busquedas del primer resultado que no sea google
-						console.log((div.getAttribute('href')))
-						console.log((res.busquedas[i]))
 						if ((div.getAttribute('href')) === (res.busquedas[i])) { // Si coincide el link con alguno de los resultados de los otros buscadores
 							switch (res.buscador) { //dependiendo que buscador del resultado estemos recorriendo se guarda la posicion en el que se encuentra
 								case 'google':

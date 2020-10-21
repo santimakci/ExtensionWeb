@@ -4,10 +4,8 @@ function agregarTitulo(results, i) {
     var p = document.createElement("p");
     var imagen = document.createElement("div");
     var img = this.createSVG(results.buscador)
-    /* url = (results.busquedas[i]).link((results.busquedas[i])) */
     url = '<a class="results" href="' + results.busquedas[i] + '">' + results.busquedas[i] + "</a>"  
     para = "<p>" + img + "    " + url + "</p>"
-    console.log(para)
     capa.innerHTML += para 
 }
 
@@ -27,7 +25,7 @@ function agregarBusquedaAlTitulo(busqueda){
 function requestResults() {
 
     browser.runtime.sendMessage({
-        "call": 'prueba'
+        "call": 'listarResultados'
     }).then(results => {
         this.agregarBusquedaAlTitulo(results[0].busqueda)
         for (var i = 0; i < 5; i++) {

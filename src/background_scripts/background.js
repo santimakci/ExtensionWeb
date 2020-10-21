@@ -4,7 +4,6 @@ class BackgroundExtension {
 
 	constructor(){
 		this.resultados = []
-		this.buscador = ''
 	}
 	
 
@@ -19,7 +18,7 @@ class BackgroundExtension {
 	}) 
 }
 
-	prueba() {
+	listarResultados() {
 		return new Promise(resolve => {
 			this.resultados = []
 			this.getCurrentTab().then((tabs) => {
@@ -57,7 +56,6 @@ class BackgroundExtension {
 	duckduckgoResults(busqueda) {
 			var url = 'https://duckduckgo.com/html/' + '?q=' + busqueda 
 			var doc = this.consulta(url)
-			console.log(doc)
 			var busquedas = []
 			var anchors = doc.getElementsByClassName('result__a')
 			Array.from(anchors).forEach(link => {
@@ -111,7 +109,6 @@ class BackgroundExtension {
 			results.push(args.search)
 			results.push(this.duckduckgoResults(args.busqueda)) 
 			this.resultados = results
-			this.buscador = 'google'
 			resolve(this.resultados)
 		});
 	}
@@ -123,7 +120,6 @@ class BackgroundExtension {
 			results.push(this.bingResults(args.busqueda))
 			results.push(args.search)
 			this.resultados = results
-			this.buscador = 'duckduckgo'
 			resolve(this.resultados)
 		});
 	}
@@ -135,7 +131,6 @@ class BackgroundExtension {
 			results.push(this.googleResults(args.busqueda))
 			results.push(args.search)
 			this.resultados = results
-			this.buscador = 'bing'
 			resolve(this.resultados)
 		});
 	}
