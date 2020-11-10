@@ -1,45 +1,40 @@
 {
-    "manifest_version" : 2,
-    "author" : "Santiago",
-    "name" : "Buscador",
-    "version": "1.0",
-
-    "browser_action" :
-     {
-        "default_icon": "icons/caja.png",
-        "default_title" : "Buscar",
-        "default_popup": "popup/buscar.html"
-    },
-
-    "background" : {
-        "scripts": ["background_scripts/background.js"],
-        "persistent" : false
-    },
-
-    "content_scripts": [
-        {
-        "matches": [
-                    "*://*.google.com/*", 
-                    "*://*.bing.com/*",
-                    "*://*.duckduckgo.com/*"
-                    ],
-        "js" : [ "content_scripts/main.js"
-                                
-         ] 
-        }
-    ], 
-
-    "permissions": [
-        "*",
-        "tabs",
-        "storage",
-        "<all_urls>",
-        "webRequest",
-        "webRequestBlocking"
-        
-      ], 
-      "web_accessible_resources": [
-        "*"
+  "manifest_version": 2,
+  "author": "Santiago",
+  "name": "Buscador",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icons/caja.png",
+    "default_title": "Buscar",
+    "default_popup": "popup/buscar.html"
+  },
+  "background": {
+    "scripts": [
+      "background_scripts/background.js"
+    ],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.google.com/*",
+        "*://*.bing.com/*",
+        "*://*.duckduckgo.com/*"
+      ],
+      "js": [
+        "content_scripts/main.js"
       ]
-
+    }
+  ],
+  "permissions": [
+    "*",
+    "tabs",
+    "storage",
+    "<all_urls>",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "web_accessible_resources": [
+    "*"
+  ]
 }
