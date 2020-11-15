@@ -1,4 +1,5 @@
 
+
 function agregarTitulo(results, i) {
   var capa = document.getElementById("cuerpo");
   var p = document.createElement("p");
@@ -45,5 +46,3 @@ function printPos() {
 
 
 this.requestResults()
-/* this.printPos()
- */

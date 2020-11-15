@@ -21,26 +21,35 @@ class contentPage {
     (this.page).imprimirPos(args.resultados)
   }
 
+  guardarBusqueda() {
+    console.log("Entra")
+    return new Promise((resolve) => {
+      const params = new URL(location.href).searchParams; //Estas dos lineas captarn la busqueda enviada por metodo get en los buscadores
+      var result = params.get('q');
+      resolve(result)
+    })
+  }
 
   captarBusqueda() {
     return new Promise((resolve) => {
-      const params = new URL(location.href).searchParams; //Estas dos lineas captar la busqueda enviada por metodo get en los buscadores
-      const busqueda = params.get('q');
-      if (busqueda != null) {
-        var buscador = this.identificarBuscador(window.location.hostname)
-        this.page = eval('new ' + buscador + '()')
-        var busquedas = (this.page).buscar()
-        var search = new SearchResult(buscador, busqueda, busquedas);
-        browser.runtime.sendMessage({
-          "call": buscador,
-          "args": {
-            "busqueda": busqueda,
-            "search": search
-          }
-        }).then(news => {
-          resolve(news)
-        });
-      }
+      this.guardarBusqueda().then(result => {
+        var busqueda = result
+        if (busqueda != null) {
+          var buscador = this.identificarBuscador(window.location.hostname)
+          this.page = eval('new ' + buscador + '()')
+          var busquedas = (this.page).buscar()
+          var search = new SearchResult(buscador, busqueda, busquedas);
+          browser.runtime.sendMessage({
+            "call": buscador,
+            "args": {
+              "busqueda": busqueda,
+              "search": search
+            }
+          }).then(news => {
+            resolve(news)
+          });
+        }
+      })
     });
   }
 
