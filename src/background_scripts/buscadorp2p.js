@@ -1,3 +1,4 @@
+
 /*
 * Copyright ragonzalez@disroot.org. Licensed under MIT
 * See license text at https://mit-license.org/license.txt
@@ -31,6 +32,8 @@ function getRemoteUser() {
   }
 }
 
+
+
 class BuscadorP2P extends AbstractP2PExtensionBackground {
 
   constructor() {
@@ -51,8 +54,12 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
       if (msg.type === "RequestResult") {
 
         console.log("Llegó solicitud de búsqueda resultados");
-        console.log(msg.buscador)
-        console.log(msg.busqueda)
+        var buscadorInstance = new BackgroundExtension
+        var results = []
+        results.push(buscadorInstance.googleResults(msg.busqueda))
+        results.push(buscadorInstance.duckduckgoResults(msg.busqueda))
+        results.push(buscadorInstance.bingResults(msg.busqueda))
+        console.log(results)
 
         browser.notifications.create({
           "type": "basic",
@@ -65,7 +72,7 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
           type: 'check',
           status: true,
           automatic: false,
-          dato: "Un dato"
+          searchResults: results
         }, peer);
 
 
@@ -100,7 +107,9 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
     try {
       if (msg.type === 'check') {
         console.log("Llegaron los resultados");
-        console.log(msg.dato)
+        let listaUsuarios = sample.getDataCallBack();
+        console.log(listaUsuarios.length)
+        console.log(msg.searchResults)
         browser.notifications.create({
           "type": "basic",
           "title": "Llegaron resultados",

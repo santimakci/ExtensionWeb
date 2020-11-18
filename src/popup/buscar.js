@@ -23,26 +23,62 @@ function agregarBusquedaAlTitulo(busqueda) {
 }
 
 
+
 function requestResults() {
 
   browser.runtime.sendMessage({
     "call": 'listarResultados'
   }).then(results => {
+    sendData(results[0])
     this.agregarBusquedaAlTitulo(results[0].busqueda)
     for (var i = 0; i < 5; i++) {
       this.agregarTitulo(results[0], i)
       this.agregarTitulo(results[1], i)
       this.agregarTitulo(results[2], i)
+
     }
+    printPeers()
 
   })
 }
 
-function printPos() {
+function printPeers() {
   browser.runtime.sendMessage({
-    "call": 'imprimirPosiciones'
+    "call": 'printPeers'
   })
 }
 
 
-this.requestResults()
+/* PS2 METHODS --------------------------------------------------------*/
+
+function sendData(Response) {
+
+  try {
+
+    let usuarioSelected = usuarios.selectedIndex;
+
+
+    let usuario = usuarios.options[usuarioSelected].value;
+
+    p2pExtension.sendRequest({
+      type: 'RequestResult',
+      busqueda: Response.busqueda,
+      totalPeers: usuarioSelected.length,
+      automatic: false
+    }, usuario);
+
+  } catch (e) {
+    console.log("Error al utilizar sendData.");
+    console.log(e);
+  }
+
+}
+
+
+requestResults()
+
+
+
+
+
+

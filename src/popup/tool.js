@@ -6,12 +6,8 @@ const codeInput = document.querySelector("#code");
 var uuid = '';
 var p2pExtension = backgroundPage_1.sample;
 /* ---------------------------------------------- */
-function getCurrentTab(callback) {
-  return browser.tabs.query({
-    active: true,
-    currentWindow: true
-  });
-}
+
+
 
 /* ---------------------------------------------- */
 
@@ -41,12 +37,9 @@ function loadUsersCustom(event) {
 }
 
 function sendData() {
-  getCurrentTab().then((tabs) => {
-    browser.tabs.sendMessage(tabs[0].id, {
-      call: "captarBusqueda",
-    }).then(Response => {
-      console.log("hola")
-    })
+  browser.runtime.sendMessage({
+    "call": 'getBuscador'
+  }).then(Response => {
 
     try {
 
@@ -56,6 +49,8 @@ function sendData() {
 
       p2pExtension.sendRequest({
         type: 'RequestResult',
+        buscador: Response.buscador,
+        busqueda: Response.busqueda,
         automatic: false
       }, usuario);
 
@@ -69,8 +64,8 @@ function sendData() {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  document.querySelector('#senddata').addEventListener('click', sendData);
-  p2pExtension.getQueryP2P(loadUsersCustom, 'peers', {});
+/*   document.querySelector('#senddata').addEventListener('click', sendData);
+ */  p2pExtension.getQueryP2P(loadUsersCustom, 'peers', {});
 
 
 });

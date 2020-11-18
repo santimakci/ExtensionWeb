@@ -1,9 +1,20 @@
-
+"use strict";
 
 class BackgroundExtension {
 
   constructor() {
     this.resultados = []
+  }
+
+  getBuscador() {
+    return new Promise(resolve => {
+      resolve(
+        {
+          "busqueda": this.resultados[0].busqueda,
+          "buscador": this.resultados[0].buscador
+        })
+    })
+
   }
 
   imprimirPosiciones() {
@@ -15,6 +26,15 @@ class BackgroundExtension {
         }
       })
     })
+  }
+
+  printPeers() {
+    this.getCurrentTab().then((tabs) => {
+      browser.tabs.sendMessage(tabs[0].id, {
+        call: "imprimirPeers",
+      })
+    })
+
   }
 
   listarResultados() {
@@ -154,6 +174,8 @@ browser.runtime.onMessage.addListener((request, sender) => {
     return extension[request.call](request.args);
   }
 })
+
+
 
 
 

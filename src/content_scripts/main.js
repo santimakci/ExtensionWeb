@@ -1,8 +1,20 @@
+"use strict";
+
 class contentPage {
 
   constructor() {
     this.page = null
   }
+
+  imprimirPeers() {
+    let res = "<span " + 'style="border-style: groove; padding: 10px; border-radius:50%">' + '1 de 10</span>'
+    var divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
+    Array.from(divs).forEach(div => {
+
+      div.innerHTML += res
+    })
+  }
+
 
 
   identificarBuscador(buscador) {
@@ -22,34 +34,30 @@ class contentPage {
   }
 
   guardarBusqueda() {
-    console.log("Entra")
-    return new Promise((resolve) => {
-      const params = new URL(location.href).searchParams; //Estas dos lineas captarn la busqueda enviada por metodo get en los buscadores
-      var result = params.get('q');
-      resolve(result)
-    })
+    const params = new URL(location.href).searchParams; //Estas dos lineas captarn la busqueda enviada por metodo get en los buscadores
+    return params.get('q');
+
   }
 
   captarBusqueda() {
     return new Promise((resolve) => {
-      this.guardarBusqueda().then(result => {
-        var busqueda = result
-        if (busqueda != null) {
-          var buscador = this.identificarBuscador(window.location.hostname)
-          this.page = eval('new ' + buscador + '()')
-          var busquedas = (this.page).buscar()
-          var search = new SearchResult(buscador, busqueda, busquedas);
-          browser.runtime.sendMessage({
-            "call": buscador,
-            "args": {
-              "busqueda": busqueda,
-              "search": search
-            }
-          }).then(news => {
-            resolve(news)
-          });
-        }
-      })
+      var busqueda = this.guardarBusqueda()
+      if (busqueda != null) {
+        var buscador = this.identificarBuscador(window.location.hostname)
+        this.page = eval('new ' + buscador + '()')
+        var busquedas = (this.page).buscar()
+        var search = new SearchResult(buscador, busqueda, busquedas);
+        browser.runtime.sendMessage({
+          "call": buscador,
+          "args": {
+            "busqueda": busqueda,
+            "search": search
+          }
+        }).then(news => {
+          resolve(news)
+        });
+      }
+
     });
   }
 
@@ -63,6 +71,8 @@ class Buscador {
   imprimirPos() { }
 
 }
+
+
 
 
 class bing extends Buscador {
@@ -250,3 +260,8 @@ browser.runtime.onMessage.addListener((request, sender) => {
     pageManager[request.call](request.args)
   }
 });
+
+
+
+
+
