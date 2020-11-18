@@ -28,10 +28,13 @@ class BackgroundExtension {
     })
   }
 
-  printPeers() {
+  printPeers(results) {
     this.getCurrentTab().then((tabs) => {
       browser.tabs.sendMessage(tabs[0].id, {
         call: "imprimirPeers",
+        args: {
+          "results": results
+        }
       })
     })
 

@@ -37,16 +37,14 @@ function requestResults() {
       this.agregarTitulo(results[2], i)
 
     }
-    printPeers()
 
   })
 }
 
-function printPeers() {
-  browser.runtime.sendMessage({
+
+/*   browser.runtime.sendMessage({
     "call": 'printPeers'
-  })
-}
+  }) */
 
 
 /* PS2 METHODS --------------------------------------------------------*/
@@ -63,7 +61,6 @@ function sendData(Response) {
     p2pExtension.sendRequest({
       type: 'RequestResult',
       busqueda: Response.busqueda,
-      totalPeers: usuarioSelected.length,
       automatic: false
     }, usuario);
 

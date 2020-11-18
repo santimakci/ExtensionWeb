@@ -107,9 +107,10 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
     try {
       if (msg.type === 'check') {
         console.log("Llegaron los resultados");
-        let listaUsuarios = sample.getDataCallBack();
-        console.log(listaUsuarios.length)
         console.log(msg.searchResults)
+        var buscadorInstance = new BackgroundExtension
+        buscadorInstance.printPeers(msg.searchResults)
+
         browser.notifications.create({
           "type": "basic",
           "title": "Llegaron resultados",

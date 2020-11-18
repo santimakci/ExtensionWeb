@@ -6,16 +6,9 @@ class contentPage {
     this.page = null
   }
 
-  imprimirPeers() {
-    let res = "<span " + 'style="border-style: groove; padding: 10px; border-radius:50%">' + '1 de 10</span>'
-    var divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
-    Array.from(divs).forEach(div => {
-
-      div.innerHTML += res
-    })
+  imprimirPeers(args) {
+    (this.page).imprimirPeers(args.results)
   }
-
-
 
   identificarBuscador(buscador) {
     var separador = "."
@@ -67,8 +60,15 @@ class contentPage {
 
 class Buscador {
   /* Métodos abstractos ejecutados en las clases hijas */
+  constructor() {
+    this.totalPeers = 0
+    this.totalPeersCoincidence = 0
+    this.resultsPage = []
+  }
+
   buscar() { }
   imprimirPos() { }
+  imprimirPeers() { }
 
 }
 
@@ -131,6 +131,42 @@ class bing extends Buscador {
 
 class google extends Buscador {
 
+  constructor() {
+    super()
+  }
+
+
+  imprimirPeers(resultados) {
+    this.totalPeers++
+    console.log(this.resultsPage)
+    var googleResults = resultados[0].busquedas
+    console.log(googleResults)
+    var divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
+    divs = Array.from(divs)
+    console.log(divs)
+    for (var i = 0; i < divs.length; i++) {
+      if (googleResults.includes((divs[0].querySelector('a')['href']))) {
+        this.resultsPage[i] += 1
+      }
+      var sp = document.createElement("span")
+      sp.setAttribute("id", ("sp" + i));
+      sp.style.borderRadius = "50%"
+      sp.style.borderStyle = "groove"
+      sp.style.padding = "10px"
+      var content = document.createTextNode((this.resultsPage[i] + 'de' + this.totalPeers))
+      sp.appendChild(content)
+      var oldSpan = document.getElementById(("sp" + i))
+
+      if (oldSpan != null) {
+        var parentDiv = oldSpan.parentNode;
+        parentDiv.replaceChild(sp, oldSpan);
+      }
+      else {
+        divs[i].appendChild(sp)
+      }
+    }
+  }
+
   buscar() {
     var busquedas = []
     var divs = document.getElementsByClassName("yuRUbf")
@@ -138,10 +174,14 @@ class google extends Buscador {
       busquedas.push((div.querySelector('a')['href']))
     });
     busquedas = Array.from(new Set(busquedas))
+    for (var i = 0; i <= busquedas.length; i++) {
+      this.resultsPage[i] = 0
+    }
     return busquedas
   }
 
   imprimirPos(resultados) {
+
     var divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
     Array.from(divs).forEach(div => {
       var bing = 0 // Estas variables indican la posicion de la direccion del div en los otros buscadores
