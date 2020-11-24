@@ -59,7 +59,6 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
         results.push(buscadorInstance.googleResults(msg.busqueda))
         results.push(buscadorInstance.duckduckgoResults(msg.busqueda))
         results.push(buscadorInstance.bingResults(msg.busqueda))
-        console.log(results)
 
         browser.notifications.create({
           "type": "basic",
@@ -107,9 +106,13 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
     try {
       if (msg.type === 'check') {
         console.log("Llegaron los resultados");
-        console.log(msg.searchResults)
         var buscadorInstance = new BackgroundExtension
         buscadorInstance.printPeers(msg.searchResults)
+        browser.runtime.sendMessage({
+          "call": "PopupAction",
+          "results": msg.searchResults
+        })
+
 
         browser.notifications.create({
           "type": "basic",

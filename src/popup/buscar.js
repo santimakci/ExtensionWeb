@@ -23,28 +23,21 @@ function agregarBusquedaAlTitulo(busqueda) {
 }
 
 
-
 function requestResults() {
 
   browser.runtime.sendMessage({
     "call": 'listarResultados'
   }).then(results => {
+    console.log(results)
     sendData(results[0])
     this.agregarBusquedaAlTitulo(results[0].busqueda)
     for (var i = 0; i < 5; i++) {
       this.agregarTitulo(results[0], i)
       this.agregarTitulo(results[1], i)
       this.agregarTitulo(results[2], i)
-
     }
-
   })
 }
-
-
-/*   browser.runtime.sendMessage({
-    "call": 'printPeers'
-  }) */
 
 
 /* PS2 METHODS --------------------------------------------------------*/
@@ -70,6 +63,18 @@ function sendData(Response) {
   }
 
 }
+
+function renderPromedios(results){
+  console.log("RESULTADOSOJALAANDE")
+  console.log(results)
+}
+
+browser.runtime.onMessage.addListener((request, sender) => {
+  if ( request.call === 'PopupAction') {
+    renderPromedios(request.results)
+  }
+});
+
 
 
 requestResults()

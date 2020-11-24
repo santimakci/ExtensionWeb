@@ -39,6 +39,7 @@ class contentPage {
         var buscador = this.identificarBuscador(window.location.hostname)
         this.page = eval('new ' + buscador + '()')
         var busquedas = (this.page).buscar()
+        console.log(busquedas)
         var search = new SearchResult(buscador, busqueda, busquedas);
         browser.runtime.sendMessage({
           "call": buscador,
@@ -69,29 +70,71 @@ class Buscador {
   buscar() { }
   imprimirPos() { }
   imprimirPeers() { }
+  createSpan(i){
+    var sp = document.createElement("span")
+    sp.setAttribute("id", ("sp" + i));
+    sp.style.borderRadius = "50%"
+    sp.style.borderStyle = "groove"
+    sp.style.padding = "10px"
+    var content = document.createTextNode((this.resultsPage[i] + 'de' + this.totalPeers))
+    sp.appendChild(content)
+    return sp
+
+  }
+  initializeResultsPage(BusquedasLength){
+    for (var i = 0; i <= BusquedasLength; i++) {
+      this.resultsPage[i] = 0
+    }
+  }
 
 }
-
-
-
 
 class bing extends Buscador {
 
   buscar() {
     var busquedas = []
-    var anchors = document.getElementsByClassName("b_title")
-
+    var anchors = document.getElementsByClassName("b_algo")
+    console.log(anchors)
     Array.from(anchors).forEach(link => {
       Array.from(link.getElementsByTagName('a')).forEach(href => {
         busquedas.push(href.getAttribute('href'))
       })
     })
     busquedas = Array.from(new Set(busquedas))
+    this.initializeResultsPage(busquedas.length)
     return busquedas
   }
 
+  imprimirPeers(resultados) {
+
+    this.totalPeers++
+    console.log(this.resultsPage)
+    var bingResults = resultados[2].busquedas
+    console.log(bingResults)
+    var divs = document.getElementsByClassName("b_algo") 
+    divs = Array.from(divs)
+    for (var i = 0; i < divs.length; i++) {
+      Array.from(divs[i].getElementsByTagName('h2')).forEach(h2 => {
+        Array.from(h2.getElementsByTagName('a')).forEach(href => {
+          if ( bingResults.includes(href.getAttribute('href')) ){
+            this.resultsPage[i] += 1
+          }   
+          var sp = this.createSpan(i)
+          var oldSpan = document.getElementById(("sp" + i))
+          if (oldSpan != null) {
+            var parentDiv = oldSpan.parentNode;
+            parentDiv.replaceChild(sp, oldSpan);
+          }
+          else {
+            h2.appendChild(sp)
+          }
+        })
+      })
+    }
+  }
+
   imprimirPos(resultados) {
-    var divs = document.getElementsByClassName("b_title") /* Me traigo todos los lso divs donde hay que imprimir */
+    var divs = document.getElementsByClassName("b_algo") /* Me traigo todos los lso divs donde hay que imprimir */
     Array.from(divs).forEach(div => {
       Array.from(div.getElementsByTagName('h2')).forEach(h2 => {
         Array.from(h2.getElementsByTagName('a')).forEach(href => {
@@ -112,11 +155,11 @@ class bing extends Buscador {
               }
               if (res.buscador === 'duckduckgo') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
                 var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-                div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;">' + duckduckgo + "</strong> "
+                h2.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;">' + duckduckgo + "</strong> "
               }
               else {
                 var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-                div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + google + "</strong> "
+                h2.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + google + "</strong> "
 
               }
             }
@@ -128,12 +171,7 @@ class bing extends Buscador {
 
 }
 
-
 class google extends Buscador {
-
-  constructor() {
-    super()
-  }
 
 
   imprimirPeers(resultados) {
@@ -147,16 +185,9 @@ class google extends Buscador {
     for (var i = 0; i < divs.length; i++) {
       if (googleResults.includes((divs[0].querySelector('a')['href']))) {
         this.resultsPage[i] += 1
-      }
-      var sp = document.createElement("span")
-      sp.setAttribute("id", ("sp" + i));
-      sp.style.borderRadius = "50%"
-      sp.style.borderStyle = "groove"
-      sp.style.padding = "10px"
-      var content = document.createTextNode((this.resultsPage[i] + 'de' + this.totalPeers))
-      sp.appendChild(content)
+      }   
+      var sp = this.createSpan(i)
       var oldSpan = document.getElementById(("sp" + i))
-
       if (oldSpan != null) {
         var parentDiv = oldSpan.parentNode;
         parentDiv.replaceChild(sp, oldSpan);
@@ -174,9 +205,7 @@ class google extends Buscador {
       busquedas.push((div.querySelector('a')['href']))
     });
     busquedas = Array.from(new Set(busquedas))
-    for (var i = 0; i <= busquedas.length; i++) {
-      this.resultsPage[i] = 0
-    }
+    this.initializeResultsPage(busquedas.length)
     return busquedas
   }
 
@@ -235,8 +264,30 @@ class duckduckgo extends Buscador {
         final.push(string)
       }
     })
+    this.initializeResultsPage(final.length)
     return final
 
+  }
+
+  imprimirPeers(resultados) {
+    this.totalPeers++
+    var duckduckgoResults = resultados[1].busquedas
+    var divs = document.getElementsByClassName("result__a") 
+    divs = Array.from(divs)
+    for (var i = 0; i < divs.length; i++) {
+      if (duckduckgoResults.includes((divs[i].getAttribute('href')))) {
+        this.resultsPage[i] += 1
+      }   
+      var sp = this.createSpan(i)
+      var oldSpan = document.getElementById(("sp" + i))
+      if (oldSpan != null) {
+        var parentDiv = oldSpan.parentNode;
+        parentDiv.replaceChild(sp, oldSpan);
+      }
+      else {
+        divs[i].appendChild(sp)
+      }
+    }
   }
 
   imprimirPos(resultados) {

@@ -36,31 +36,6 @@ function loadUsersCustom(event) {
   }
 }
 
-function sendData() {
-  browser.runtime.sendMessage({
-    "call": 'getBuscador'
-  }).then(Response => {
-
-    try {
-
-      let usuarioSelected = usuarios.selectedIndex;
-
-      let usuario = usuarios.options[usuarioSelected].value;
-
-      p2pExtension.sendRequest({
-        type: 'RequestResult',
-        buscador: Response.buscador,
-        busqueda: Response.busqueda,
-        automatic: false
-      }, usuario);
-
-    } catch (e) {
-      console.log("Error al utilizar sendData.");
-      console.log(e);
-    }
-  })
-}
-
 
 document.addEventListener('DOMContentLoaded', function () {
 
