@@ -39,7 +39,6 @@ class contentPage {
         var buscador = this.identificarBuscador(window.location.hostname)
         this.page = eval('new ' + buscador + '()')
         var busquedas = (this.page).buscar()
-        console.log(busquedas)
         var search = new SearchResult(buscador, busqueda, busquedas);
         browser.runtime.sendMessage({
           "call": buscador,
@@ -94,7 +93,6 @@ class bing extends Buscador {
   buscar() {
     var busquedas = []
     var anchors = document.getElementsByClassName("b_algo")
-    console.log(anchors)
     Array.from(anchors).forEach(link => {
       Array.from(link.getElementsByTagName('a')).forEach(href => {
         busquedas.push(href.getAttribute('href'))
@@ -108,9 +106,7 @@ class bing extends Buscador {
   imprimirPeers(resultados) {
 
     this.totalPeers++
-    console.log(this.resultsPage)
     var bingResults = resultados[2].busquedas
-    console.log(bingResults)
     var divs = document.getElementsByClassName("b_algo") 
     divs = Array.from(divs)
     for (var i = 0; i < divs.length; i++) {
@@ -176,12 +172,9 @@ class google extends Buscador {
 
   imprimirPeers(resultados) {
     this.totalPeers++
-    console.log(this.resultsPage)
     var googleResults = resultados[0].busquedas
-    console.log(googleResults)
     var divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
     divs = Array.from(divs)
-    console.log(divs)
     for (var i = 0; i < divs.length; i++) {
       if (googleResults.includes((divs[0].querySelector('a')['href']))) {
         this.resultsPage[i] += 1
