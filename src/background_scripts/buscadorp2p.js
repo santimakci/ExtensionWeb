@@ -56,6 +56,7 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
         console.log("Llegó solicitud de búsqueda resultados");
         var buscadorInstance = new BackgroundExtension
         var results = []
+        /* Generamos los resultados de los 3 buscadores */
         results.push(buscadorInstance.googleResults(msg.busqueda))
         results.push(buscadorInstance.duckduckgoResults(msg.busqueda))
         results.push(buscadorInstance.bingResults(msg.busqueda))
@@ -66,7 +67,6 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
           "message": "DESDE: " + peer
         });
 
-        //Envia respuesta de OK recepcion
         this.sendResponse({
           type: 'check',
           status: true,
@@ -108,11 +108,11 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
         console.log("Llegaron los resultados");
         var buscadorInstance = new BackgroundExtension
         buscadorInstance.printPeers(msg.searchResults)
+        /* Le mandamos al popup los resultados que llegan */
         browser.runtime.sendMessage({
           "call": "PopupAction",
           "results": msg.searchResults
         })
-
 
         browser.notifications.create({
           "type": "basic",
@@ -128,27 +128,6 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
     }
   }
 
-  automaticProcessing(extractor, peer) {
-    console.log("Automatic procesing...");
-  }
-
-  getDataP2P() {
-    try {
-      return this.dataTemp;
-    } catch (e) {
-      console.log("Error al intentar acceder al traductor");
-      console.log(e);
-    }
-  }
-
-  setDataP2P(data) {
-    try {
-      this.dataTemp = data;
-    } catch (e) {
-      console.log("Error al intentar acceder al traductor");
-      console.log(e);
-    }
-  }
 
 }
 

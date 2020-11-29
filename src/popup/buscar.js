@@ -1,6 +1,6 @@
 
 
-
+/* Métodos para renderizar los resultados del popup*/
 function agregarTitulo(results, i) {
   var capa = document.getElementById("cuerpo");
   var p = document.createElement("p");
@@ -64,7 +64,10 @@ function renderPromedios(results){
 
   
 }
-/* Class coincidencias --------------------------------------------------------*/
+
+/* --------------------------------------------------------*/
+
+/* Class para manejar el promedio y las ocurrencias en los resultados de los peers*/
 
 class ResultsPromedios{
 
@@ -79,10 +82,10 @@ class ResultsPromedios{
     this.totalPeers++
   }
 
-  createSpan(i, totalPeers, totalApariciones, sp){
+  createSpan(i, totalPeers, totalApariciones, sp, prom){
     var sp = document.createElement("span")
     sp.setAttribute("id", (sp + i));
-    var content = document.createTextNode(("    " +totalApariciones + ' de ' + totalPeers))
+    var content = document.createTextNode("  | Posición promedio: " +  prom + (" ( " +totalApariciones + ' de ' + totalPeers + ")"))
     sp.appendChild(content)
     return sp
 
@@ -103,9 +106,13 @@ class ResultsPromedios{
     for (var i = 0; i < 5; i++) {
       if(results.includes((this.googleProms[i]).link)){
         (this.googleProms[i]).totalApariciones++
-        (this.googleProms[i]).posPromedio = ((this.googleProms[i]).posPromedio  + results.indexOf((this.googleProms[i]).link)) / this.totalPeers        
+        var pos = results.indexOf((this.googleProms[i]).link)
+        pos++
+        (this.googleProms[i]).posPromedio = ((this.googleProms[i]).posPromedio  + pos) / this.totalPeers        
       }
-      var sp = this.createSpan(i, this.totalPeers, (this.googleProms[i]).totalApariciones, "g" )
+
+
+      var sp = this.createSpan(i, this.totalPeers, (this.googleProms[i]).totalApariciones, "g", this.googleProms[i].posPromedio )
       var rs = document.getElementById(("google" + i))
       var oldSpan = document.getElementById(("g" + i))
       this.renderSpan(oldSpan, rs, sp)
@@ -119,9 +126,11 @@ class ResultsPromedios{
       
       if(results.includes((this.bingProms[i]).link)){
         (this.bingProms[i]).totalApariciones++
-        (this.bingProms[i]).posPromedio = ((this.bingProms[i]).posPromedio  + results.indexOf((this.bingProms[i]).link)) / this.totalPeers  
+        var pos = results.indexOf((this.bingProms[i]).link)
+        pos++
+        (this.bingProms[i]).posPromedio = ((this.bingProms[i]).posPromedio  + pos) / this.totalPeers  
       }
-      var sp = this.createSpan(i, this.totalPeers, (this.bingProms[i]).totalApariciones, "b" )
+      var sp = this.createSpan(i, this.totalPeers, (this.bingProms[i]).totalApariciones, "b", this.bingProms[i].posPromedio )
       var rs = document.getElementById(("bing" + i))
       var oldSpan = document.getElementById(("b" + i))
       this.renderSpan(oldSpan, rs, sp)
@@ -133,9 +142,11 @@ class ResultsPromedios{
     for (var i = 0; i < 5; i++) {     
       if(results.includes((this.DuckDuckGoProms[i]).link)){
         (this.DuckDuckGoProms[i]).totalApariciones++
-        (this.DuckDuckGoProms[i]).posPromedio = ((this.DuckDuckGoProms[i]).posPromedio  + results.indexOf((this.DuckDuckGoProms[i]).link)) / this.totalPeers
+        var pos = results.indexOf((this.DuckDuckGoProms[i]).link)
+        pos++
+        (this.DuckDuckGoProms[i]).posPromedio = ((this.DuckDuckGoProms[i]).posPromedio  + pos) / this.totalPeers
       }
-      var sp = this.createSpan(i, this.totalPeers, (this.DuckDuckGoProms[i]).totalApariciones, "d" )
+      var sp = this.createSpan(i, this.totalPeers, (this.DuckDuckGoProms[i]).totalApariciones, "d", this.DuckDuckGoProms[i].posPromedio )
       var rs = document.getElementById(("duckduckgo" + i))
       var oldSpan = document.getElementById(("d" + i))
       this.renderSpan(oldSpan, rs, sp)
@@ -179,14 +190,14 @@ class ResultsPromedios{
 
 }
 
+/* --------------------------------------------------------*/
 
+/* P2P METHODS, Captar los peers y enviar la busqueda para renderizar en la página*/
+var backgroundPage_1 = browser.extension.getBackgroundPage();
+var usuarios = document.getElementById("listusers");
+var listItems = document.getElementById("listitems");
+var p2pExtension = backgroundPage_1.sample;
 
-
-
-
-
-
-/* PS2 METHODS --------------------------------------------------------*/
 
 function sendData(Response) {
 
@@ -210,15 +221,49 @@ function sendData(Response) {
 
 }
 
+function loadUsersCustom(event) {
+  try {
+
+    let listaUsuarios = p2pExtension.getDataCallBack();
+
+    if (listaUsuarios != null || listaUsuarios != undefined || listaUsuarios !== "undefined") {
+
+      let usuarios = document.getElementById("listusers");
+      let optionOne = new Option("All", "All");
+      usuarios.options.length = 0;
+      usuarios.options[usuarios.options.length] = optionOne;
+      for (let i in listaUsuarios.peers) {
+        if (listaUsuarios.peers.hasOwnProperty(i)) {
+          let optionNew = new Option(listaUsuarios.peers[i].username, listaUsuarios.peers[i].username);
+          usuarios.options[usuarios.options.length] = optionNew;
+        }
+      };
+    };
+
+  } catch (e) {
+    console.log("Error al cargar lista de usuarios");
+    console.log(e);
+  }
+}
+
+/* ---------------------------------------------- */
+
+
 var ResultsPromediosInstance = new ResultsPromedios
 requestResults()
 
+
+/* Listeners de recepción de resultados y peers */
 browser.runtime.onMessage.addListener((request, sender) => {
   if ( request.call === 'PopupAction') {
     renderPromedios(request.results)
   }
 });
 
+
+document.addEventListener('DOMContentLoaded', function () {
+  p2pExtension.getQueryP2P(loadUsersCustom, 'peers', {});
+});
 
 
 
