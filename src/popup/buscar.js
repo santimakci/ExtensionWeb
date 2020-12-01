@@ -40,7 +40,6 @@ function requestResults() {
 
     }
   })
-  ResultsPromediosInstance.getArrays()
 
 }
 
@@ -180,12 +179,6 @@ class ResultsPromedios{
       
     });
 
-  }
-
-  getArrays(){
-    console.log(this.googleProms)
-    console.log(this.bingProms)
-    console.log(this.DuckDuckGoProms)
   }
 
 }
