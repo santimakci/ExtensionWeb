@@ -1,4 +1,4 @@
-"use strict";
+
 
 class contentPage {
 
@@ -92,11 +92,12 @@ class bing extends Buscador {
 
   buscar() {
     var busquedas = []
-    var anchors = document.getElementsByClassName("b_algo")
-    Array.from(anchors).forEach(link => {
-      Array.from(link.getElementsByTagName('a')).forEach(href => {
-        busquedas.push(href.getAttribute('href'))
-      })
+    var anchors = document.querySelectorAll("div cite")
+    Array.from(anchors).forEach(href => {
+        if ((href.innerText).includes('http')) {
+          busquedas.push(href.innerText)
+      }
+
     })
     busquedas = Array.from(new Set(busquedas))
     this.initializeResultsPage(busquedas.length)
@@ -240,8 +241,6 @@ class google extends Buscador {
 }
 
 
-
-
 class duckduckgo extends Buscador {
 
   buscar() {
@@ -317,9 +316,6 @@ class duckduckgo extends Buscador {
   }
 
 }
-
-
-
 
 
 class SearchResult {

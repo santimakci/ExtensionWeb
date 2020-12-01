@@ -1,39 +1,3 @@
-
-/*
-* Copyright ragonzalez@disroot.org. Licensed under MIT
-* See license text at https://mit-license.org/license.txt
-*/
-var url_text = "";
-var remoteuser = "";
-var jquery_link;
-var popper_link;
-var bootstrap_link;
-var boostrap_css;
-var tabActive = null;
-
-//variables que usa el process local
-
-var remoteuser;
-var remoteResponse = null;
-var ports = [];
-var portFromCS;
-
-
-function getDataResultadoP2P() {
-  return remoteResponse;
-}
-
-function getRemoteUser() {
-  try {
-    return remoteuser;
-  } catch (e) {
-    console.log("Error el retornar usuario peer");
-    console.log(e);
-  }
-}
-
-
-
 class BuscadorP2P extends AbstractP2PExtensionBackground {
 
   constructor() {
@@ -44,13 +8,8 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
     this.setExtensionId(browser.runtime.id);
   }
 
-  initialize() {
-
-  }
-
   processRequest(msg, peer) {
     try {
-      remoteuser = peer;
       if (msg.type === "RequestResult") {
 
         console.log("Llegó solicitud de búsqueda resultados");
