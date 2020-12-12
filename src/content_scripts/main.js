@@ -63,6 +63,7 @@ class Buscador {
     this.totalPeers = 0
     this.totalPeersCoincidence = 0
     this.resultsPage = []
+    this.busquedas = []
   }
 
   buscar() { }
@@ -84,23 +85,37 @@ class Buscador {
       this.resultsPage[i] = 0
     }
   }
+  printResults(nodo, buscador, result){
+    let ruta = browser.extension.getURL("img/" + buscador + ".png")
+    nodo.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + result + "</strong> "    
+}
+  appendSpan(i, nodo){
+    var sp = this.createSpan(i)
+    var oldSpan = document.getElementById(("sp" + i))
+    if (oldSpan != null) {
+      var parentDiv = oldSpan.parentNode;
+      parentDiv.replaceChild(sp, oldSpan);
+    }
+    else {
+      nodo.appendChild(sp)
+    }
+  
+}
 
 }
 
 class bing extends Buscador {
 
   buscar() {
-    var busquedas = []
     var anchors = document.querySelectorAll("div cite")
     Array.from(anchors).forEach(href => {
         if ((href.innerText).includes('http')) {
-          busquedas.push(href.innerText)
+          this.busquedas.push(href.innerText)
       }
-
     })
-    busquedas = Array.from(new Set(busquedas))
-    this.initializeResultsPage(busquedas.length)
-    return busquedas
+    this.busquedas = Array.from(new Set(this.busquedas))
+    this.initializeResultsPage(this.busquedas.length)
+    return this.busquedas
   }
 
   imprimirPeers(resultados) {
@@ -115,22 +130,14 @@ class bing extends Buscador {
           if ( bingResults.includes(href.getAttribute('href')) ){
             this.resultsPage[i] += 1
           }   
-          var sp = this.createSpan(i)
-          var oldSpan = document.getElementById(("sp" + i))
-          if (oldSpan != null) {
-            var parentDiv = oldSpan.parentNode;
-            parentDiv.replaceChild(sp, oldSpan);
-          }
-          else {
-            h2.appendChild(sp)
-          }
+          this.appendSpan(i,h2)
         })
       })
     }
   }
 
   imprimirPos(resultados) {
-    let divs = document.getElementsByClassName("b_algo") /* Me traigo todos los lso divs donde hay que imprimir */
+    let divs = document.getElementsByClassName("b_algo") /* Me traigo todos los divs donde hay que imprimir */
     Array.from(divs).forEach(div => {
       Array.from(div.getElementsByTagName('h2')).forEach(h2 => {
         Array.from(h2.getElementsByTagName('a')).forEach(href => {
@@ -138,25 +145,19 @@ class bing extends Buscador {
           let duckduckgo = 0 // por defecto se inicializan en 0 para cada div
           resultados.forEach(res => {  //recorremos los resultados
             if (res.buscador != 'bing') { // entramos en aquellos que no sea igual a la pagina que estamos escribiendo
-              for (var i = 0; i < (res.busquedas).length; i++) {
-                //Recorremos todas las busquedas del primer resultado que no sea google
+              for (var i = 0; i < (res.busquedas).length; i++) { //Recorremos todas las busquedas del primer resultado que no sea google
                 if (href.getAttribute('href') === (res.busquedas[i])) { // Si coincide el link con alguno de los resultados de los otros buscadores
                   switch (res.buscador) { //dependiendo que buscador del resultado estemos recorriendo se guarda la posicion en el que se encuentra
-                    case 'duckduckgo':
-                      duckduckgo = (i + 1)
-                    case 'google':
-                      google = (i + 1)
+                    case 'duckduckgo': duckduckgo = (i + 1)
+                    case 'google': google = (i + 1)
                   }
                 }
               }
               if (res.buscador === 'duckduckgo') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
-                let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-                h2.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;">' + duckduckgo + "</strong> "
+                this.printResults(h2,res.buscador,duckduckgo)
               }
               else {
-                let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-                h2.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + google + "</strong> "
-
+                this.printResults(h2,res.buscador,google)
               }
             }
           })
@@ -176,65 +177,48 @@ class google extends Buscador {
     let divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
     divs = Array.from(divs)
     for (var i = 0; i < divs.length; i++) {
-      if (googleResults.includes((divs[0].querySelector('a')['href']))) {
+      if (googleResults.includes((divs[i].querySelector('a')['href']))) {
         this.resultsPage[i] += 1
       }   
-      let sp = this.createSpan(i)
-      let oldSpan = document.getElementById(("sp" + i))
-      if (oldSpan != null) {
-        let parentDiv = oldSpan.parentNode;
-        parentDiv.replaceChild(sp, oldSpan);
-      }
-      else {
-        divs[i].appendChild(sp)
-      }
+      this.appendSpan(i, divs[i])
     }
   }
 
   buscar() {
-    var busquedas = []
     var divs = document.getElementsByClassName("yuRUbf")
     Array.from(divs).forEach(div => {
-      busquedas.push((div.querySelector('a')['href']))
+      this.busquedas.push((div.querySelector('a')['href']))
     });
-    busquedas = Array.from(new Set(busquedas))
-    this.initializeResultsPage(busquedas.length)
-    return busquedas
+    this.busquedas = Array.from(new Set(this.busquedas))
+    this.initializeResultsPage(this.busquedas.length)
+    return this.busquedas
   }
 
   imprimirPos(resultados) {
-
-    var divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
+    let divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
     Array.from(divs).forEach(div => {
-      var bing = 0 // Estas variables indican la posicion de la direccion del div en los otros buscadores
-      var duckduckgo = 0 // por defecto se inicializan en 0 para cada div
+      let bing = 0 // Estas variables indican la posicion de la direccion del div en los otros buscadores
+      let duckduckgo = 0 // por defecto se inicializan en 0 para cada div
       resultados.forEach(res => {  //recorremos los resultados
-        if (res.buscador != 'google') { // entramos en aquellos que no sea igual a la pagina que estamos escribiendo
-          for (var i = 0; i < (res.busquedas).length; i++) { //Recorremos todas las busquedas del primer resultado que no sea google
-            if ((div.querySelector('a')['href']) === (res.busquedas[i])) { // Si coincide el link con alguno de los resultados de los otros buscadores
-              switch (res.buscador) { //dependiendo que buscador del resultado estemos recorriendo se guarda la posicion en el que se encuentra
-                case 'duckduckgo':
-                  duckduckgo = (i + 1)
-                case 'bing':
-                  bing = (i + 1)
-              }
+      if (res.buscador != 'google') { // entramos en aquellos que no sea igual a la pagina que estamos escribiendo
+        for (var i = 0; i < (res.busquedas).length; i++) { //Recorremos todas las busquedas del primer resultado que no sea google
+          if ((div.querySelector('a')['href']) === (res.busquedas[i])) { // Si coincide el link con alguno de los resultados de los otros buscadores
+            switch (res.buscador) { //dependiendo que buscador del resultado estemos recorriendo se guarda la posicion en el que se encuentra
+              case 'duckduckgo': duckduckgo = (i + 1)
+              case 'bing': bing = (i + 1) 
             }
           }
-          if (res.buscador === 'duckduckgo') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
-            var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-            div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;">' + duckduckgo + "</strong> "
-          }
-          else {
-            var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-            div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + bing + "</strong> "
-
-          }
         }
-      })
-
-    });
-
-  }
+        if (res.buscador === 'duckduckgo') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
+              this.printResults(div,res.buscador,duckduckgo)
+        }
+        else {
+              this.printResults(div,res.buscador,bing)
+        }
+      }
+    })
+  });
+}
 
 
 }
@@ -243,14 +227,13 @@ class google extends Buscador {
 class duckduckgo extends Buscador {
 
   buscar() {
-    var busquedas = []
     var anchors = document.getElementsByClassName("result__a")
     Array.from(anchors).forEach(link => {
-      busquedas.push(link.getAttribute('href'))
+      this.busquedas.push(link.getAttribute('href'))
     })
-    busquedas = Array.from(new Set(busquedas))
+    this.busquedas = Array.from(new Set(this.busquedas))
     var final = []
-    busquedas.forEach(string => {
+    this.busquedas.forEach(string => {
       if (!string.includes('duckduckgo')) {
         final.push(string)
       }
@@ -262,22 +245,14 @@ class duckduckgo extends Buscador {
 
   imprimirPeers(resultados) {
     this.totalPeers++
-    var duckduckgoResults = resultados[1].busquedas
-    var divs = document.getElementsByClassName("result__a") 
+    let duckduckgoResults = resultados[1].busquedas
+    let divs = document.getElementsByClassName("result__a") 
     divs = Array.from(divs)
     for (var i = 0; i < divs.length; i++) {
       if (duckduckgoResults.includes((divs[i].getAttribute('href')))) {
         this.resultsPage[i] += 1
       }   
-      var sp = this.createSpan(i)
-      var oldSpan = document.getElementById(("sp" + i))
-      if (oldSpan != null) {
-        var parentDiv = oldSpan.parentNode;
-        parentDiv.replaceChild(sp, oldSpan);
-      }
-      else {
-        divs[i].appendChild(sp)
-      }
+      this.appendSpan(i, divs[i])
     }
   }
 
@@ -291,22 +266,15 @@ class duckduckgo extends Buscador {
           for (var i = 0; i < (res.busquedas).length; i++) { //Recorremos todas las busquedas del primer resultado que no sea google
             if ((div.getAttribute('href')) === (res.busquedas[i])) { // Si coincide el link con alguno de los resultados de los otros buscadores
               switch (res.buscador) { //dependiendo que buscador del resultado estemos recorriendo se guarda la posicion en el que se encuentra
-                case 'google':
-                  google = (i + 1)
-                case 'bing':
-                  bing = (i + 1)
+                case 'google': google = (i + 1)
+                case 'bing': bing = (i + 1)
               }
             }
           }
-          if (res.buscador === 'google') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
-            let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-            div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;">' + google + "</strong> "
-          }
-          else {
-            let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
-            div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + bing + "</strong> "
-
-          }
+        if (res.buscador === 'google') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
+          this.printResults(div,res.buscador,google)}
+        else {
+          this.printResults(div,res.buscador,bing)}
         }
       })
 

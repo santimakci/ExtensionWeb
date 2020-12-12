@@ -30,6 +30,7 @@ function requestResults() {
     "call": 'listarResultados'
   }).then(results => {
     sendData(results[0])
+    
     this.agregarBusquedaAlTitulo(results[0].busqueda)
 
     for (var i = 0; i < 5; i++) {
