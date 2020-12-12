@@ -123,7 +123,31 @@ class BackgroundExtension {
 
   }
 
-  google(args) {
+  captarResults(args){
+     return new Promise((resolve) => {
+      var results = []
+      results.push(args.search)
+      switch(args.search.buscador){
+        case "google":
+          results.push(this.bingResults(args.search.busqueda))
+          results.push(this.duckduckgoResults(args.search.busqueda))
+          break;
+        case "bing":
+          results.push(this.duckduckgoResults(args.search.busqueda))
+          results.push(this.googleResults(args.search.busqueda))
+          break;
+        case "duckduckgo":
+          results.push(this.googleResults(args.search.busqueda))
+          results.push(this.bingResults(args.search.busqueda))
+          break;
+      }
+      this.resultados = results
+      resolve(this.resultados)
+    });
+
+  }
+
+  /* google(args) {
     return new Promise((resolve, reject) => {
       var results = []
       results.push(this.bingResults(args.busqueda))
@@ -154,7 +178,7 @@ class BackgroundExtension {
       this.resultados = results
       resolve(this.resultados)
     });
-  }
+  } */
 
 }
 

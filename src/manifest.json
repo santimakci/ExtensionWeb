@@ -4,7 +4,7 @@
   "name": "Buscador",
   "version": "1.0",
   "browser_action": {
-    "default_icon": "icons/caja.svg",
+    "default_icon": "icons/caja.png",
     "default_title": "Buscar",
     "default_popup": "popup/buscar.html"
   },

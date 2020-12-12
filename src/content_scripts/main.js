@@ -41,9 +41,8 @@ class contentPage {
         var busquedas = (this.page).buscar()
         var search = new SearchResult(buscador, busqueda, busquedas);
         browser.runtime.sendMessage({
-          "call": buscador,
+          "call": "captarResults",
           "args": {
-            "busqueda": busqueda,
             "search": search
           }
         }).then(news => {
@@ -107,8 +106,8 @@ class bing extends Buscador {
   imprimirPeers(resultados) {
 
     this.totalPeers++
-    var bingResults = resultados[2].busquedas
-    var divs = document.getElementsByClassName("b_algo") 
+    let bingResults = resultados[2].busquedas
+    let divs = document.getElementsByClassName("b_algo") 
     divs = Array.from(divs)
     for (var i = 0; i < divs.length; i++) {
       Array.from(divs[i].getElementsByTagName('h2')).forEach(h2 => {
@@ -131,12 +130,12 @@ class bing extends Buscador {
   }
 
   imprimirPos(resultados) {
-    var divs = document.getElementsByClassName("b_algo") /* Me traigo todos los lso divs donde hay que imprimir */
+    let divs = document.getElementsByClassName("b_algo") /* Me traigo todos los lso divs donde hay que imprimir */
     Array.from(divs).forEach(div => {
       Array.from(div.getElementsByTagName('h2')).forEach(h2 => {
         Array.from(h2.getElementsByTagName('a')).forEach(href => {
-          var google = 0 // Estas variables indican la posicion de la direccion del div en los otros buscadores
-          var duckduckgo = 0 // por defecto se inicializan en 0 para cada div
+          let google = 0 // Estas variables indican la posicion de la direccion del div en los otros buscadores
+          let duckduckgo = 0 // por defecto se inicializan en 0 para cada div
           resultados.forEach(res => {  //recorremos los resultados
             if (res.buscador != 'bing') { // entramos en aquellos que no sea igual a la pagina que estamos escribiendo
               for (var i = 0; i < (res.busquedas).length; i++) {
@@ -151,11 +150,11 @@ class bing extends Buscador {
                 }
               }
               if (res.buscador === 'duckduckgo') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
-                var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
+                let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
                 h2.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;">' + duckduckgo + "</strong> "
               }
               else {
-                var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
+                let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
                 h2.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + google + "</strong> "
 
               }
@@ -173,17 +172,17 @@ class google extends Buscador {
 
   imprimirPeers(resultados) {
     this.totalPeers++
-    var googleResults = resultados[0].busquedas
-    var divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
+    let googleResults = resultados[0].busquedas
+    let divs = document.getElementsByClassName("yuRUbf") /* Me traigo todos los lso divs donde hay que imprimir */
     divs = Array.from(divs)
     for (var i = 0; i < divs.length; i++) {
       if (googleResults.includes((divs[0].querySelector('a')['href']))) {
         this.resultsPage[i] += 1
       }   
-      var sp = this.createSpan(i)
-      var oldSpan = document.getElementById(("sp" + i))
+      let sp = this.createSpan(i)
+      let oldSpan = document.getElementById(("sp" + i))
       if (oldSpan != null) {
-        var parentDiv = oldSpan.parentNode;
+        let parentDiv = oldSpan.parentNode;
         parentDiv.replaceChild(sp, oldSpan);
       }
       else {
@@ -283,10 +282,10 @@ class duckduckgo extends Buscador {
   }
 
   imprimirPos(resultados) {
-    var divs = document.getElementsByClassName("result__a") /* Me traigo todos los lso divs donde hay que imprimir */
+    let divs = document.getElementsByClassName("result__a") /* Me traigo todos los lso divs donde hay que imprimir */
     Array.from(divs).forEach(div => {
-      var bing = 0 // Estas variables indican la posicion de la direccion del div en los otros buscadores
-      var google = 0 // por defecto se inicializan en 0 para cada div
+      let bing = 0 // Estas variables indican la posicion de la direccion del div en los otros buscadores
+      let google = 0 // por defecto se inicializan en 0 para cada div
       resultados.forEach(res => {  //recorremos los resultados
         if (res.buscador != 'duckduckgo') { // entramos en aquellos que no sea igual a la pagina que estamos escribiendo
           for (var i = 0; i < (res.busquedas).length; i++) { //Recorremos todas las busquedas del primer resultado que no sea google
@@ -300,11 +299,11 @@ class duckduckgo extends Buscador {
             }
           }
           if (res.buscador === 'google') { // siempre va a imprimir una posicion, si hubo coincidencia va a tener guardada la posicion en la variables duckduckgo o bing
-            var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
+            let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
             div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;">' + google + "</strong> "
           }
           else {
-            var ruta = browser.extension.getURL("img/" + res.buscador + ".png")
+            let ruta = browser.extension.getURL("img/" + res.buscador + ".png")
             div.innerHTML += ' <img src="' + ruta + '" width=30 height=30>  <strong style="font-size: x-large;" >' + bing + "</strong> "
 
           }

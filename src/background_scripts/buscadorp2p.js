@@ -2,8 +2,6 @@ class BuscadorP2P extends AbstractP2PExtensionBackground {
 
   constructor() {
     super();
-    this.listado = {};
-    this.dataTemp = null;
     this.setExtensionName("buscadorP2P");
     this.setExtensionId(browser.runtime.id);
   }
