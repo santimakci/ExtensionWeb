@@ -48,6 +48,7 @@ class BackgroundExtension {
           call: "captarBusqueda"
         }).then(() => {
           this.imprimirPosiciones()
+          console.log('this resultados',this.resultados)
           resolve(this.resultados)
         })
       })
@@ -60,6 +61,45 @@ class BackgroundExtension {
       currentWindow: true
     });
   }
+
+
+  captarResults(args){
+     return new Promise((resolve) => {
+      switch(args.search.buscador){
+        case "google":
+          var SearchResultsInstance = new googleSearchResults(args.search.buscador, args.search.busqueda, args.search.busquedas)
+          break;
+        case "bing":
+          var SearchResultsInstance = new bingSearchResults(args.search.buscador, args.search.busqueda, args.search.busquedas)
+          break;
+        case "duckduckgo":
+          var SearchResultsInstance = new duckduckgoSearchResults(args.search.buscador, args.search.busqueda, args.search.busquedas)
+          break;
+      }
+      SearchResultsInstance.allResults().then(
+      (response) =>{
+        console.log('caca',response)
+          this.resultados = response
+          resolve(response)
+        }
+      )
+      
+    });
+
+  }
+
+}
+
+class SearchResult {
+
+  constructor(buscador, busqueda, resultados) {
+
+    this.buscador = buscador;
+    this.busqueda = busqueda;
+    this.busquedas = resultados;
+  }
+
+  allResults(){}
 
   consulta(url) {
     var request = new XMLHttpRequest();
@@ -75,6 +115,7 @@ class BackgroundExtension {
   }
 
   duckduckgoResults(busqueda) {
+    return new Promise(resolve =>{
     var url = 'https://duckduckgo.com/html/' + '?q=' + busqueda
     var doc = this.consulta(url)
     var busquedas = []
@@ -89,12 +130,15 @@ class BackgroundExtension {
         final.push(string)
       }
     })
-    var search = new SearchResult('duckduckgo', busqueda, final);
-    return search
+    var ducksearch = new duckduckgoSearchResults('duckduckgo', busqueda, final);
+    console.log('resultados', ducksearch)
+    resolve(ducksearch)
+    })
   }
 
 
   googleResults(busqueda) {
+    return new Promise(resolve =>{
     var url = 'http://www.google.com/' + 'search?q=' + busqueda + '&oq=' + busqueda
     var doc = this.consulta(url)
     var busquedas = []
@@ -103,12 +147,14 @@ class BackgroundExtension {
       busquedas.push((div.querySelector('a')['href']))
     });
     busquedas = Array.from(new Set(busquedas))
-    var search = new SearchResult('google', busqueda, busquedas);
-    return search
+    var search = new googleSearchResult('google', busqueda, busquedas);
+    console.log('resultados', search)
+    resolve(search )
+    })
   }
 
   bingResults(busqueda) {
-
+    return new Promise(resolve =>{
     var url = 'http://www.bing.com/' + 'search?q=' + busqueda + '&oq=' + busqueda
     var doc = this.consulta(url)
     var busquedas = []
@@ -118,77 +164,74 @@ class BackgroundExtension {
       }
     })
     busquedas = Array.from(new Set(busquedas))
-    var search = new SearchResult('bing', busqueda, busquedas);
-    return search
-
+    var search = new bingSearchResults('bing', busqueda, busquedas);
+    console.log('bing',search)
+    resolve(search )
+    })
   }
-
-  captarResults(args){
-     return new Promise((resolve) => {
-      var results = []
-      results.push(args.search)
-      switch(args.search.buscador){
-        case "google":
-          results.push(this.bingResults(args.search.busqueda))
-          results.push(this.duckduckgoResults(args.search.busqueda))
-          break;
-        case "bing":
-          results.push(this.duckduckgoResults(args.search.busqueda))
-          results.push(this.googleResults(args.search.busqueda))
-          break;
-        case "duckduckgo":
-          results.push(this.googleResults(args.search.busqueda))
-          results.push(this.bingResults(args.search.busqueda))
-          break;
-      }
-      this.resultados = results
-      resolve(this.resultados)
-    });
-
-  }
-
-  /* google(args) {
-    return new Promise((resolve, reject) => {
-      var results = []
-      results.push(this.bingResults(args.busqueda))
-      results.push(args.search)
-      results.push(this.duckduckgoResults(args.busqueda))
-      this.resultados = results
-      resolve(this.resultados)
-    });
-  }
-
-  duckduckgo(args) {
-    return new Promise((resolve) => {
-      var results = []
-      results.push(this.googleResults(args.busqueda))
-      results.push(this.bingResults(args.busqueda))
-      results.push(args.search)
-      this.resultados = results
-      resolve(this.resultados)
-    });
-  }
-
-  bing(args) {
-    return new Promise((resolve) => {
-      var results = []
-      results.push(this.duckduckgoResults(args.busqueda))
-      results.push(this.googleResults(args.busqueda))
-      results.push(args.search)
-      this.resultados = results
-      resolve(this.resultados)
-    });
-  } */
 
 }
 
-class SearchResult {
+class bingSearchResults extends SearchResult{
+  allResults(){
+   
+    return new Promise(resolve =>{
+      var results = []
+      results.push(this)
+      this.duckduckgoResults(this.busqueda).then(
+        response =>{
+          results.push(response)
+        }).then( r =>{
+          this.googleResults(this.busqueda).then( resp =>{
+          results.push(resp)
+        }).then(
+          resolve(results)
+          )      
+        })
+    })
 
-  constructor(buscador, busqueda, resultados) {
+  }
 
-    this.buscador = buscador;
-    this.busqueda = busqueda;
-    this.busquedas = resultados;
+
+}
+class googleSearchResults extends SearchResult{
+  allResults(){
+    return new Promise(resolve =>{
+      var results = []
+      results.push(this)
+      this.bingResults(this.busqueda).then(
+        response =>{
+          console.log('ddg', response)
+          results.push(response)
+        }).then( r =>{
+          this.duckduckgoResults(this.busqueda).then( resp =>{
+          results.push(resp)
+        }).then(
+          resolve(results)
+          )      
+        })
+    })
+    
+  }
+
+}
+
+class duckduckgoSearchResults extends SearchResult{
+  allResults(){
+      return new Promise(resolve =>{
+        var results = []
+        results.push(this)
+        this.googleResults(this.busqueda).then(
+          response =>{
+            results.push(response)
+          }).then( r =>{
+            this.bingResults(this.busqueda).then( resp =>{
+            results.push(resp)
+          }).then(
+            resolve(results)
+            )      
+          })
+      })
   }
 
 }

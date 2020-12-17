@@ -29,6 +29,9 @@ function requestResults() {
   browser.runtime.sendMessage({
     "call": 'listarResultados'
   }).then(results => {
+    
+    try{
+    
     sendData(results[0])
     
     this.agregarBusquedaAlTitulo(results[0].busqueda)
@@ -39,6 +42,10 @@ function requestResults() {
       this.agregarTitulo(results[1], i)
       this.agregarTitulo(results[2], i)
 
+    }
+  }
+    catch{
+      console.log("se produjo un error en requestResults", results)
     }
   })
 
@@ -196,7 +203,7 @@ var p2pExtension = backgroundPage_1.sample;
 function sendData(Response) {
 
   try {
-
+    
     let usuarioSelected = usuarios.selectedIndex;
 
 
@@ -210,6 +217,7 @@ function sendData(Response) {
 
   } catch (e) {
     console.log("Error al utilizar sendData.");
+    console.log(Response)
     console.log(e);
   }
 

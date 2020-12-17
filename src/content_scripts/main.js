@@ -46,6 +46,7 @@ class contentPage {
             "search": search
           }
         }).then(news => {
+          console.log('entro main', news)
           resolve(news)
         });
       }
